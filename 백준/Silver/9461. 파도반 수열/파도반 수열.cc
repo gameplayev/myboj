@@ -1,28 +1,18 @@
 #include <bits/stdc++.h>
 using namespace std;
-long long int mem[101] = {-1,};
-long long int f(int x){
-    if(x < 3){
-        if(x == 0) return 0;
-        return 1;
-    }
-    if(mem[x] != -1){
-        return mem[x];
-    }
-    else{
-        mem[x] = f(x-2) + f(x-3);
-        return mem[x];
-    }
-}
 
 int main(void){
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     int n; cin>>n;
-    memset(mem,-1,sizeof(mem));
+    long long int dp[101] = {};
+    dp[0] = 0; dp[1] = 1; dp[2] = 1; //init
+    for(int i = 3;i<101;i++){
+        dp[i] = dp[i-2] + dp[i-3];
+    }
     for(int i = 0;i<n;i++){
         int x; cin>>x;
-        cout<<f(x)<<"\n";
+        cout<<dp[x]<<"\n";
     }
     
     
