@@ -1,88 +1,88 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// Correct comparator function to compare vectors based on their first element
-bool cmp(const vector<int>& left, const vector<int>& right) {
-    if(left.empty()) return false;  // Assume empty vectors go last
-    if(right.empty()) return true;
-    return left[0] < right[0];
+bool cmp(vector<int>& a, vector<int>& b) {
+    if (a.empty() || b.empty()) return false;
+    return (a[0] < b[0]);
 }
 
-vector<int> graph[101010];
-vector<int> graph_rev[101010];
-stack<int> st;
-vector<int> cycle[101010];
-int v, e, cnt = 0;
-bool vis[101010] = {false,};
-
-void DFS(int x) {
+void DFS(int x, vector<bool>& vis, vector<vector<int>>& graph, stack<int>& st) {
     vis[x] = true;
-    for(int i : graph[x]) {
-        if(!vis[i]) {
-            DFS(i);
+    for (int i : graph[x]) {
+        if (!vis[i]) {
+            DFS(i, vis, graph, st);
         }
     }
     st.push(x);
 }
 
-void DFS_rev(int x, int id) {
+void DFS_rev(int x, vector<bool>& vis, vector<vector<int>>& graph_rev, vector<vector<int>>& cycle, int id) {
     vis[x] = true;
-    cycle[id].push_back(x);
-    for(int i : graph_rev[x]) {
-        if(!vis[i]) {
-            DFS_rev(i, id);
+    cycle[id].emplace_back(x);
+    for (int i : graph_rev[x]) {
+        if (!vis[i]) {
+            DFS_rev(i, vis, graph_rev, cycle, id);
         }
     }
 }
 
-int main(void) {
+int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     
+    int v, e;
     cin >> v >> e;
-    for(int i = 0; i < e; i++) {
+
+    vector<vector<int>> graph(v + 1);
+    vector<vector<int>> graph_rev(v + 1);
+    vector<bool> vis(v + 1, false);
+    vector<vector<int>> cycle(v + 1);
+    int id = 0;
+    stack<int> st;
+
+    for (int i = 0; i < e; i++) {
         int a, b;
         cin >> a >> b;
-        graph[a].push_back(b);
-        graph_rev[b].push_back(a);
-    }
-    
-    // Run DFS from all nodes to ensure we consider disconnected parts of the graph
-    for (int i = 1; i <= v; i++) {
-        if (!vis[i]) {
-            DFS(i);
+        if (a > 0 && a <= v && b > 0 && b <= v) {
+            graph[a].push_back(b);
+            graph_rev[b].push_back(a);
         }
     }
 
-    memset(vis, false, sizeof(vis));
-    
-    // Run DFS on the reversed graph to find strongly connected components
-    while(!st.empty()) {
+    for (int i = 1; i <= v; i++) {
+        if (!vis[i]) {
+            DFS(i, vis, graph, st);
+        }
+    }
+    // First DFS
+
+    fill(vis.begin(), vis.end(), false);
+
+    while (!st.empty()) {
         int cur = st.top();
         st.pop();
         if (!vis[cur]) {
-            cnt++;
-            DFS_rev(cur, cnt);
+            DFS_rev(cur, vis, graph_rev, cycle, id);
+            id++;
         }
     }
-    
-    cout << cnt << "\n";
-    // Sort each SCC vector
-    for(int i = 1; i <= cnt; i++){
+    // Second DFS
+
+    cout << id << "\n";
+    for (int i = 0; i < id; i++) {
         sort(cycle[i].begin(), cycle[i].end());
     }
-    
-    // Sort the array of vectors (SCCs) using the custom comparator
-    sort(cycle + 1, cycle + cnt + 1, cmp);
-    
-    // Print the sorted SCCs
-    for (int i = 1; i <= cnt; i++) {
-        for(int j : cycle[i]) {
-            cout << j << " ";
+    cycle.resize(id);
+    sort(cycle.begin(), cycle.end(), cmp);
+
+    for (int i = 0; i < id; i++) {
+        if (!cycle[i].empty()) {
+            for (auto j : cycle[i]) {
+                cout << j << " ";
+            }
+            cout << "-1\n";
         }
-        cout << "-1\n";
     }
-    
+
     return 0;
 }
-	
