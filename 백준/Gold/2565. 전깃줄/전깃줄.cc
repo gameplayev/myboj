@@ -1,49 +1,32 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
-
-vector<pair<int, int>> arr;
-vector<int> dp;
-vector<int> x;
-int res = 0, n;
-
-void LIS() {
-    if (!arr.empty()) {
-        x.push_back(arr[0].second);
-        dp.push_back(1);
-    }
-
-    for (int i = 1; i < arr.size(); i++) {
-        if (arr[i].second > x.back()) {
-            x.emplace_back(arr[i].second);
-            dp.push_back(dp.back() + 1);
-        } else {
-            auto it = lower_bound(x.begin(), x.end(), arr[i].second);
-            int idx = it - x.begin();
-            x[idx] = arr[i].second;
-        }
-    }
-
-    res = dp.back();  
-}
 
 int main(void) {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
+    
+    int n;
     cin >> n;
-
-    for (int i = 0; i < n; i++) {
-        int a, b;
-        cin >> a >> b;
-        arr.emplace_back(a, b);
+    vector<pair<int, int>> arr;
+    
+    for(int i = 0; i < n; i++) {
+        int a, b; cin>>a>>b;
+        arr.emplace_back(a,b);
     }
-
-   
+    
+    vector<int> dp(n, 1);
     sort(arr.begin(), arr.end());
-
-    LIS();
-    cout << n - res << "\n";
-
+    
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < i; j++) {
+            if(arr[i].second > arr[j].second) {
+                dp[i] = max(dp[i], dp[j] + 1);
+            }
+        }
+    }
+    
+    int lis_length = *max_element(dp.begin(), dp.end());
+    cout << n - lis_length;
+    
     return 0;
 }
