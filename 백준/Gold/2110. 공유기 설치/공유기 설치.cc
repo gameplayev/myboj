@@ -15,7 +15,7 @@ int main(void){
     sort(pos.begin(),pos.end());
     int ans = 0;
     int start = 1;
-    int end = pos[n-1] - pos[0];
+    int end = pos[n-1];
     while(start <= end){
         int mid = (start +end) /2;
         int prev = pos[0]; int cnt = 1;
