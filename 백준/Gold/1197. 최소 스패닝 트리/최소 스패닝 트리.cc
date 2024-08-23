@@ -1,63 +1,23 @@
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <cstring>
+#include <bits/stdc++.h>
 using namespace std;
+using pii = pair<int,int>;
 
-struct graph{
-    int u,v;
-    int w;
+struct node{
+    int node;
+    int linked_node;
+    int cost;
 };
-//data define
 
-void init(int x,vector<int>& par);
-int find(int x,vector<int>& par);
-bool cmp(graph& a, graph& b);
-void unite(int a,int b,vector<int>& par);
-//funcs define
-
-int main(void){
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
-    //fastio
-
-    vector<int> par(10101); //union find par
-    int v,e; //vertex edges
-    graph g[100101] = {}; //grap
-    int res = 0;// result
-    //vars
-
-    cin>>v>>e;
-    for(int i = 0;i<e;i++){
-        cin>>g[i].u>>g[i].v>>g[i].w;
-    }
-    //input
-    
-    init(v,par);
-    sort(g,g+e,cmp);
-
-    for(int i = 0;i<e;i++){
-        if(find(g[i].u,par) == find(g[i].v,par)){continue;}
-        unite(g[i].u,g[i].v,par);
-        res += g[i].w;
-    }
-    //main logic(cal mst)
-
-    cout<<res<<"\n";
-    //print res
-    return 0;
-}
-
-//funcs
-void init(int x , vector<int>& par){
-    for(int i = 1;i<=x;i++){
+vector<int> init(vector<int>& par){
+    for(int i = 1;i<par.size();i++){
         par[i] = i;
     }
+    return par;
 }
 
 int find(int x,vector<int>& par){
     if(par[x] == x) return x;
-    else return par[x] = find(par[x],par);
+    return par[x] = find(par[x],par);
 }
 
 void unite(int a,int b, vector<int>& par){
@@ -66,8 +26,31 @@ void unite(int a,int b, vector<int>& par){
     par[a] = b;
 }
 
-
-bool cmp(graph&a, graph&b){
-    return (a.w < b.w);
+bool cmp(node & a, node & b){
+    return(a.cost < b.cost);
 }
 
+int main(void){
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int n,m; cin>>n>>m;
+    vector<node>graph;
+    for(int i = 0;i<m;i++){
+        node d; int a,b,c; cin>>a>>b>>c;
+        d.node = a; d.linked_node = b; d.cost = c;
+        graph.emplace_back(d);
+    }
+    vector<int>par(n+1);
+    init(par);
+    sort(graph.begin(),graph.end(),cmp);
+    
+    long long res = 0;
+    for(int i = 0;i<m;i++){
+        node cur = graph[i];
+        if(find(cur.node,par) == find(cur.linked_node,par)){continue;}
+        unite(cur.node,cur.linked_node,par);
+        res += cur.cost;
+    }
+    cout<<res<<"\n";
+    return 0;
+}
