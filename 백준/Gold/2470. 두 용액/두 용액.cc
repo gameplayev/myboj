@@ -1,45 +1,48 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-#include <cstring>
+#include <algorithm>
+#include <cstdlib> 
 #include <limits.h>
 using namespace std;
 
-
-int main(void){
+int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
-    int n; cin>>n;
-    int arr[101010] = {};
-    for(int i = 0;i<n;i++){
-        cin>>arr[i];
-    }
-    sort(arr,arr+n);
+    int N;
+    cin >> N;
 
-    int l = 0,r = 0;
-    int res = INT_MAX;
-    
-    int start = 0, end = n-1;
-    
-    while(start != end){
-        int cal = arr[start] + arr[end];
-        if(res > abs(cal)){
-            res = abs(cal);
-            l = arr[start];
-            r = arr[end];
+    vector<int> solutions(N);
+    for (int i = 0; i < N; i++) {
+        cin >> solutions[i];
+    }
+
+    sort(solutions.begin(), solutions.end());
+
+    int left = 0;
+    int right = N - 1;
+    int bestSum = INT_MAX; 
+    pair<int, int> bestPair; 
+
+    while (left < right) {
+        int currentSum = solutions[left] + solutions[right];
+
+
+        if (abs(currentSum) < abs(bestSum)) {
+            bestSum = currentSum;
+            bestPair = {solutions[left], solutions[right]};
         }
-        if(cal > 0){
-            end --;
-        }
-        else{
-            start ++;
+
+       
+        if (currentSum > 0) {
+            right--;
+        } else {
+            
+            left++;
         }
     }
-    int ans[5] = {l,r};
-    sort(ans,ans+2);
-    for(int i = 0;i<2;i++){
-        cout<<ans[i]<<" ";
-    }
+
     
+    cout << bestPair.first << " " << bestPair.second << endl;
+
     return 0;
 }
